@@ -18,6 +18,7 @@ local right = left + cookieTexture:getWidth()
 local top = WINDOW_HEIGHT / 2 - cookieTexture:getHeight() / 2 - 64
 local bottom = top + cookieTexture:getHeight()
 
+local makeCookieBigger = true
 
 function love.load()
   love.window.setTitle('Cookie Clicker')
@@ -42,7 +43,7 @@ end
 function love.update(dt)
   local x, y = love.mouse.getPosition()
   
-  
+  makeCookieBigger = x >= left and x <= right and y >= top and y <= bottom
 end
 
 
@@ -58,7 +59,10 @@ function love.draw()
   love.graphics.draw(
     cookieTexture, 
     left, 
-    top
+    top,
+    0,  -- rotation
+    makeCookieBigger and 1.2 or 1,  -- scale factor x
+    makeCookieBigger and 1.2 or 1   -- scale factor y
   )
 
 end
