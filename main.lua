@@ -58,11 +58,13 @@ function love.draw()
   
   love.graphics.draw(
     cookieTexture, 
-    left, 
-    top,
+    left + (makeCookieBigger and cookieTexture:getWidth() / 2 or 0),
+    top + (makeCookieBigger and cookieTexture:getHeight() /2 or 0),
     0,  -- rotation
     makeCookieBigger and 1.2 or 1,  -- scale factor x
-    makeCookieBigger and 1.2 or 1   -- scale factor y
+    makeCookieBigger and 1.2 or 1,  -- scale factor y
+    makeCookieBigger and cookieTexture:getWidth() / 2 or 0, -- orientation
+    makeCookieBigger and cookieTexture:getHeight() / 2 or 0 -- orientation
   )
 
 end
