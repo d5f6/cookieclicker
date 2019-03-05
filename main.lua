@@ -8,9 +8,16 @@ local WINDOW_WIDTH = 1280
 local WINDOW_HEIGHT = 720
 
 local cookieTexture = love.graphics.newImage('graphics/cookie.png')
+local cursorTexture = love.graphics.newImage('graphics/cursor.png')
 
 local cookies = 0
+local cps = 0
+local cookiesLastSecond = 0
+local cookiesThisSecond = 0
 
+local secondTimer = 0
+
+local smallFont = love.graphics.newFont(16)
 local largeFont = love.graphics.newFont(32)
 
 local left = WINDOW_WIDTH / 2 - cookieTexture:getWidth() / 2
@@ -19,6 +26,8 @@ local top = WINDOW_HEIGHT / 2 - cookieTexture:getHeight() / 2 - 64
 local bottom = top + cookieTexture:getHeight()
 
 local makeCookieBigger = true
+
+local cursors =  {}
 
 function love.load()
   love.window.setTitle('Cookie Clicker')
@@ -37,6 +46,7 @@ end
 function love.mousepressed(x, y, button)
   if button == 1 and makeCookieBigger then
     cookies = cookies + 1
+    cookiesThisSecond = cookiesThisSecond + 1
   end
 end
 
@@ -44,6 +54,16 @@ function love.update(dt)
   local x, y = love.mouse.getPosition()
   
   makeCookieBigger = x >= left and x <= right and y >= top and y <= bottom
+
+  secondTimer = secondTimer + dt
+  if secondTimer >= 1 then
+    secondTimer = secondTimer - 1
+
+    cps = (cookiesLastSecond + cookiesThisSecond) / 2
+    cookiesLastSecond = cookiesThisSecond
+    cookiesThisSecond = 0
+  end
+
 end
 
 
@@ -55,6 +75,8 @@ function love.draw()
     WINDOW_WIDTH, 
     'center'
   )
+
+  love.graphics.printf('CPS: ' .. tostring(cps), 0, 48, WINDOW_WIDTH, 'center')
   
   love.graphics.draw(
     cookieTexture, 
@@ -66,5 +88,12 @@ function love.draw()
     makeCookieBigger and cookieTexture:getWidth() / 2 or 0, -- orientation
     makeCookieBigger and cookieTexture:getHeight() / 2 or 0 -- orientation
   )
+
+  love.graphics.draw(cursorTexture, 64, WINDOW_HEIGHT - 120)
+
+  love.graphics.setFont(smallFont)
+  love.graphics.print('Cursor', 50, WINDOW_HEIGHT - 90)
+  love.graphics.print('Cost: 10', 44, WINDOW_HEIGHT - 75)
+  love.graphics.setFont(largeFont)
 
 end
