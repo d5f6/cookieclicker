@@ -35,7 +35,7 @@ function love.keypressed(key)
 end
 
 function love.mousepressed(x, y, button)
-  if button == 1 then
+  if button == 1 and makeCookieBigger then
     cookies = cookies + 1
   end
 end
