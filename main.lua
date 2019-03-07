@@ -9,6 +9,7 @@ local WINDOW_HEIGHT = 720
 
 local cookieTexture = love.graphics.newImage('graphics/cookie.png')
 local cursorTexture = love.graphics.newImage('graphics/cursor.png')
+local grandmaTexture = love.graphics.newImage('graphics/grandma.png')
 
 local cookies = 0
 local cps = 0
@@ -27,7 +28,11 @@ local bottom = top + cookieTexture:getHeight()
 
 local makeCookieBigger = true
 
-local cursors =  {}
+-- cursors generate 1 cookie every 10 seconds
+local cursors =  0
+
+-- grandmas generate 1 cookie every 1 second
+local grandmas = 0
 
 function love.load()
   love.window.setTitle('Cookie Clicker')
@@ -48,12 +53,29 @@ function love.mousepressed(x, y, button)
     cookies = cookies + 1
     cookiesThisSecond = cookiesThisSecond + 1
   end
+
+  if button == 1 and hoveringOverCursor() then
+    if cookies >= 10 then
+      cookies = cookies - 10
+      cursors = cursors + 1
+    end
+  end
+
+  if button == 1 and hoveringOverGrandma() then
+    if cookies >= 100 then
+      cookies = cookies - 100
+      grandmas = grandmas + 1
+    end
+  end
 end
 
 function love.update(dt)
   local x, y = love.mouse.getPosition()
   
   makeCookieBigger = x >= left and x <= right and y >= top and y <= bottom
+
+  updateCursors(dt)
+  updateGrandma(dt)
 
   secondTimer = secondTimer + dt
   if secondTimer >= 1 then
@@ -69,7 +91,7 @@ end
 
 function love.draw()
   love.graphics.printf(
-    'Cookies: ' .. tostring(cookies), 
+    'Cookies: ' .. tostring(math.floor(cookies)), 
     0, 
     16, 
     WINDOW_WIDTH, 
@@ -90,10 +112,45 @@ function love.draw()
   )
 
   love.graphics.draw(cursorTexture, 64, WINDOW_HEIGHT - 120)
+  love.graphics.draw(grandmaTexture, 170, WINDOW_HEIGHT - 140)
 
   love.graphics.setFont(smallFont)
   love.graphics.print('Cursor', 50, WINDOW_HEIGHT - 90)
   love.graphics.print('Cost: 10', 44, WINDOW_HEIGHT - 75)
+  love.graphics.print('Grandma', 150, WINDOW_HEIGHT - 90)
+  love.graphics.print('Cost: 100', 150, WINDOW_HEIGHT - 75)
   love.graphics.setFont(largeFont)
 
+  love.graphics.print('Cursors: ' .. tostring(cursors))
+  love.graphics.print('Grandmas: ' .. tostring(grandmas), 0, 34)
+
+end
+
+function hoveringOverCursor()
+  local x, y = love.mouse.getPosition()
+  return x <= 64 + cursorTexture:getWidth() 
+    and x >= 50 
+    and y <= WINDOW_HEIGHT - 120 + cursorTexture:getHeight() 
+    and y >= WINDOW_HEIGHT - 120
+end
+
+function hoveringOverGrandma()
+  local x, y = love.mouse.getPosition()
+  return x <= 170 + grandmaTexture:getWidth()
+    and x >= 150
+    and y <= WINDOW_HEIGHT - 140 + grandmaTexture:getHeight()
+    and y >= WINDOW_HEIGHT - 140
+end
+
+
+function updateCursors(dt)
+  for i = 1, cursors do
+    cookies = cookies + dt * 0.1
+  end
+end
+
+function updateGrandma(dt)
+  for i = 1, grandmas do
+    cookies = cookies + dt * 1
+  end
 end
