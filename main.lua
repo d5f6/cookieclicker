@@ -15,6 +15,7 @@ local cookies = 0
 local cps = 0
 local cookiesLastSecond = 0
 local cookiesThisSecond = 0
+local passiveCookies = 0
 
 local secondTimer = 0
 
@@ -56,6 +57,7 @@ function love.mousepressed(x, y, button)
 
   if button == 1 and hoveringOverCursor() then
     if cookies >= 10 then
+      passiveCookies = passiveCookies + 0.1
       cookies = cookies - 10
       cursors = cursors + 1
     end
@@ -63,6 +65,7 @@ function love.mousepressed(x, y, button)
 
   if button == 1 and hoveringOverGrandma() then
     if cookies >= 100 then
+      passiveCookies = passiveCookies + 1
       cookies = cookies - 100
       grandmas = grandmas + 1
     end
@@ -74,8 +77,7 @@ function love.update(dt)
   
   makeCookieBigger = x >= left and x <= right and y >= top and y <= bottom
 
-  updateCursors(dt)
-  updateGrandma(dt)
+  updatePassiveCookies(dt)
 
   secondTimer = secondTimer + dt
   if secondTimer >= 1 then
@@ -85,9 +87,7 @@ function love.update(dt)
     cookiesLastSecond = cookiesThisSecond
     cookiesThisSecond = 0
   end
-
 end
-
 
 function love.draw()
   love.graphics.printf(
@@ -123,7 +123,6 @@ function love.draw()
 
   love.graphics.print('Cursors: ' .. tostring(cursors))
   love.graphics.print('Grandmas: ' .. tostring(grandmas), 0, 34)
-
 end
 
 function hoveringOverCursor()
@@ -142,15 +141,13 @@ function hoveringOverGrandma()
     and y >= WINDOW_HEIGHT - 140
 end
 
+function updatePassiveCookies(dt)
+  local cookiesLastFrame = cookies
+  cookies = cookies + passiveCookies * dt
+  local cookesAfterFrame = cookies
 
-function updateCursors(dt)
-  for i = 1, cursors do
-    cookies = cookies + dt * 0.1
-  end
-end
+  local newCookies = math.floor(cookesAfterFrame) -
+    math.floor(cookiesLastFrame)
 
-function updateGrandma(dt)
-  for i = 1, grandmas do
-    cookies = cookies + dt * 1
-  end
+  cookiesThisSecond = cookiesThisSecond + newCookies
 end
